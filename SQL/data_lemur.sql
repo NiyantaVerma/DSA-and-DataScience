@@ -77,3 +77,35 @@ FROM posts
 WHERE post_date BETWEEN '2021-01-01' AND '2021-12-31'
 GROUP BY user_id
 HAVING COUNT(post_id)>1
+
+
+--Q7
+-- Write a query to identify the top 2 Power Users who sent the highest number of messages on Microsoft Teams in August 2022. Display the IDs of these 2 users along with the total number of messages they sent. Output the results in descending order based on the count of the messages.
+SELECT 
+  sender_id,
+  COUNT(message_id) AS message_count
+FROM messages
+WHERE EXTRACT(MONTH FROM sent_date) = '8'
+  AND EXTRACT(YEAR FROM sent_date) = '2022'
+GROUP BY sender_id
+ORDER BY message_count DESC
+LIMIT 2
+
+
+--Q8
+--Assume you're given a table containing job postings from various companies on the LinkedIn platform. Write a query to retrieve the count of companies that have posted duplicate job listings.
+-- Definition:
+-- Duplicate job listings are defined as two job listings within the same company that share identical titles and descriptions.
+WITH Cte AS (
+  SELECT 
+    company_id,
+    title,
+    description,
+    COUNT(job_id) AS job_count
+  FROM job_listings
+  GROUP BY company_id,title,description
+)
+
+SELECT COUNT(DISTINCT company_id) AS duplicate_companies
+FROM Cte
+WHERE job_count > 1
