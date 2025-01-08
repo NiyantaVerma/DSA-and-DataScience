@@ -109,3 +109,60 @@ WITH Cte AS (
 SELECT COUNT(DISTINCT company_id) AS duplicate_companies
 FROM Cte
 WHERE job_count > 1
+
+
+--Q9
+--Assume you're given the tables containing completed trade orders and user details in a Robinhood trading system.
+-- Write a query to retrieve the top three cities that have the highest number of completed trade orders listed in descending order. Output the city name and the corresponding number of completed trade orders.
+
+SELECT 
+  u.city,
+  COUNT(DISTINCT t.order_id) AS total_orders
+FROM trades t
+JOIN users u
+ON t.user_id = u.user_id
+WHERE t.status = 'Completed'
+GROUP BY u.city
+ORDER BY total_orders DESC
+LIMIT 3
+
+
+--Q10
+-- Given the reviews table, write a query to retrieve the average star rating for each product, grouped by month. The output should display the month as a numerical value, product ID, and average star rating rounded to two decimal places. Sort the output first by month and then by product ID.
+SELECT 
+  EXTRACT(MONTH FROM submit_date) AS mth,
+  product_id AS product,
+  ROUND(AVG(stars),2) AS avg_stars
+FROM reviews
+GROUP BY product_id,mth
+ORDER BY mth,product
+
+
+--Q11
+-- Companies often perform salary analyses to ensure fair compensation practices. One useful analysis is to check if there are any employees earning more than their direct managers.
+-- As a HR Analyst, you're asked to identify all employees who earn more than their direct managers. The result should include the employee's ID and name.
+
+SELECT e.employee_id,
+  e.name
+FROM employee m
+INNER JOIN employee e
+ON m.employee_id = e.manager_id
+WHERE e.salary > m.salary
+
+
+--Q12
+-- Assume you have an events table on Facebook app analytics. Write a query to calculate the click-through rate (CTR) for the app in 2022 and round the results to 2 decimal places.
+
+-- Definition and note:
+
+-- Percentage of click-through rate (CTR) = 100.0 * Number of clicks / Number of impressions
+-- To avoid integer division, multiply the CTR by 100.0, not 100.
+
+SELECT 
+  app_id,
+  ROUND(100.0 * 
+  SUM(CASE WHEN event_type = 'click' THEN 1 ELSE 0 END) /
+  SUM(CASE WHEN event_type = 'impression' THEN 1 ELSE 0 END),2)
+FROM events
+WHERE EXTRACT(YEAR FROM timestamp)='2022'
+GROUP BY app_id
