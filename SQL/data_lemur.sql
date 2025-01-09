@@ -166,3 +166,46 @@ SELECT
 FROM events
 WHERE EXTRACT(YEAR FROM timestamp)='2022'
 GROUP BY app_id
+
+
+--In your post, don’t forget to tag Nick Singh, so that he can comment on and share your post with his audience of 150k+ followers on LinkedIn and 25k+ followers on Twitter (which will give your post and profile more visibility)!
+SELECT 
+  DISTINCT e.user_id
+FROM emails e
+JOIN texts t
+ON e.email_id=t.email_id
+WHERE t.signup_action = 'Confirmed'
+AND (t.action_date::DATE-e.signup_date::DATE) = 1
+
+
+--IBM is analyzing how their employees are utilizing the Db2 database by tracking the SQL queries executed by their employees. The objective is to generate data to populate a histogram that shows the number of unique queries run by employees during the third quarter of 2023 (July to September). Additionally, it should count the number of employees who did not run any queries during this period.
+-- Display the number of unique queries as histogram categories, along with the count of employees who executed that number of unique queries.
+
+WITH employee_queries AS (
+  SELECT 
+    e.employee_id,
+    COALESCE(COUNT(DISTINCT q.query_id), 0) AS unique_queries
+  FROM employees AS e
+  LEFT JOIN queries AS q
+    ON e.employee_id = q.employee_id
+      AND q.query_starttime >= '2023-07-01T00:00:00Z'
+      AND q.query_starttime < '2023-10-01T00:00:00Z'
+  GROUP BY e.employee_id
+)
+
+SELECT
+  unique_queries,
+  COUNT(employee_id) AS employee_count
+FROM employee_queries
+GROUP BY unique_queries
+ORDER BY unique_queries;
+
+
+-- Your team at JPMorgan Chase is preparing to launch a new credit card, and to gain some insights, you're analyzing how many credit cards were issued each month.
+-- Write a query that outputs the name of each credit card and the difference in the number of issued cards between the month with the highest issuance cards and the lowest issuance. Arrange the results based on the largest disparity.
+
+SELECT 
+  DISTINCT(card_name),
+  MAX(issued_amount) - MIN(issued_amount) AS difference
+FROM monthly_cards_issued
+GROUP BY card_name
