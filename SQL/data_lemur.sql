@@ -209,3 +209,63 @@ SELECT
   MAX(issued_amount) - MIN(issued_amount) AS difference
 FROM monthly_cards_issued
 GROUP BY card_name
+
+
+-- In your post, don’t forget to tag Nick Singh, so that he can comment on and share your post with his audience of 150k+ followers on LinkedIn and 25k+ followers on Twitter (which will give your post and profile more visibility)!
+SELECT 
+  ROUND(SUM(item_count::DECIMAL*order_occurrences)/Sum(order_occurrences),1) AS mean
+FROM items_per_order
+
+
+-- CVS Health is trying to better understand its pharmacy sales, and how well different products are selling. Each drug can only be produced by one manufacturer.
+-- Write a query to find the top 3 most profitable drugs sold, and how much profit they made. Assume that there are no ties in the profits. Display the result from the highest to the lowest total profit.
+-- cogs stands for Cost of Goods Sold which is the direct cost associated with producing the drug.
+-- Total Profit = Total Sales - Cost of Goods Sold
+
+SELECT 
+  drug,
+  total_sales-cogs AS total_profit
+FROM pharmacy_sales
+ORDER BY total_profit DESC
+LIMIT 3
+
+
+-- CVS Health is analyzing its pharmacy sales data, and how well different products are selling in the market. Each drug is exclusively manufactured by a single manufacturer.
+-- Write a query to identify the manufacturers associated with the drugs that resulted in losses for CVS Health and calculate the total amount of losses incurred.
+-- Output the manufacturer's name, the number of drugs associated with losses, and the total losses in absolute value. Display the results sorted in descending order with the highest losses displayed at the top.
+
+SELECT 
+  manufacturer,
+  COUNT(drug) AS drug_count,
+  ABS(SUM(total_sales-cogs)) AS total_loss
+FROM pharmacy_sales
+WHERE total_sales-cogs <= 0
+GROUP BY manufacturer
+ORDER BY total_loss DESC
+
+
+-- CVS Health wants to gain a clearer understanding of its pharmacy sales and the performance of various products.
+-- Write a query to calculate the total drug sales for each manufacturer. Round the answer to the nearest million and report your results in descending order of total sales. In case of any duplicates, sort them alphabetically by the manufacturer name.
+-- Since this data will be displayed on a dashboard viewed by business stakeholders, please format your results as follows: "$36 million".
+
+SELECT 
+  manufacturer,
+  CONCAT('$',ROUND(SUM(total_sales)/1000000),' million') AS sale
+FROM pharmacy_sales
+GROUP BY manufacturer
+ORDER BY SUM(total_sales) DESC,manufacturer
+
+
+-- UnitedHealth Group (UHG) has a program called Advocate4Me, which allows policy holders (or, members) to call an advocate and receive support for their health care needs – whether that's claims and benefits support, drug coverage, pre- and post-authorisation, medical records, emergency assistance, or member portal services.
+-- Write a query to find how many UHG policy holders made three, or more calls, assuming each call is identified by the case_id column.
+
+WITH case_count AS (
+SELECT 
+  COUNT(case_id) AS case_id_count
+FROM callers
+GROUP BY policy_holder_id
+)
+
+SELECT COUNT(case_id_count) AS policy_holder_count
+FROM case_count
+WHERE case_id_count >=3
